@@ -12,6 +12,7 @@ JOIN order_items oi ON o.order_id = oi.order_id
 GROUP BY l.branch_name
 ORDER BY total_revenue DESC;
 
+
 -- Q1 revenue by branch location, completed orders only
 SELECT  l.branch_name, 
         SUM(oi.quantity * oi.price_at_sale) AS total_revenue
@@ -45,29 +46,6 @@ SELECT  month,
 FROM monthly_revenue;
 
 
--- Product revenue ranked within each category (partition by category)
-SELECT  p.category,
-        p.product_name,
-        SUM(oi.quantity * oi.price_at_sale) AS product_revenue,
-        RANK() OVER (PARTITION BY p.category ORDER BY SUM(oi.quantity * oi.price_at_sale) DESC) AS revenue_rank
-FROM products p
-JOIN order_items oi ON p.product_id = oi.product_id
-GROUP BY p.category, p.product_name
-ORDER BY p.category, revenue_rank;
-
-
--- Top 5 customers by total revenue (top-N ranking)
-SELECT  c.name,
-        SUM(oi.quantity * oi.price_at_sale) AS customer_revenue,
-        DENSE_RANK() OVER (ORDER BY SUM(oi.quantity * oi.price_at_sale) DESC) AS revenue_rank
-FROM customers c
-JOIN orders o ON c.customer_id = o.customer_id
-JOIN order_items oi ON o.order_id = oi.order_id
-GROUP BY c.name
-ORDER BY revenue_rank
-LIMIT 5;
-
-
 -- Distinct units ordered per customer
 SELECT  c.name,
         COUNT(DISTINCT oi.product_id) AS distinct_products_ordered,
@@ -77,3 +55,49 @@ JOIN orders o ON c.customer_id = o.customer_id
 JOIN order_items oi ON o.order_id = oi.order_id
 GROUP BY c.name
 ORDER BY total_units_ordered DESC;
+
+
+-- Top 5 customers by total revenue (top-N ranking)
+WITH base AS (
+    SELECT  c.name,
+            SUM(oi.quantity * oi.price_at_sale) AS total_revenue
+    FROM customers c
+    JOIN orders o ON c.customer_id = o.customer_id
+    JOIN order_items oi ON o.order_id = oi.order_id
+    GROUP BY c.name
+),
+customer_ranking AS (
+    SELECT  name,
+            total_revenue,
+            DENSE_RANK() OVER (
+                ORDER BY total_revenue DESC
+            ) AS ranking
+    FROM base
+)
+SELECT *
+FROM customer_ranking
+WHERE ranking <= 5;
+
+
+-- Top 5 products by revenue within each category
+WITH base AS (
+    SELECT  p.category, 
+            p.product_name, 
+            SUM(oi.quantity * oi.price_at_sale) AS total_revenue
+    FROM products p 
+    JOIN order_items oi ON p.product_id = oi.product_id
+    GROUP BY p.category, p.product_name
+),
+product_ranking AS (
+    SELECT  category, 
+            product_name, 
+            total_revenue, 
+            DENSE_RANK() OVER (
+                PARTITION BY category
+                ORDER BY total_revenue DESC
+            ) AS ranking
+    FROM base
+)
+SELECT *
+FROM product_ranking
+WHERE ranking <= 5;
