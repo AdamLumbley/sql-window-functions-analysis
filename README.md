@@ -23,16 +23,19 @@ sqlite3 database.db < queries.sql
 1. **Total Revenue by Branch Location**  
    Aggregate revenue across a three-table join (`locations` -> `orders` -> `order_items`), ranked highest to lowest.
 
-2. **Month-over-Month Revenue Change & Cumulative Revenue**  
+2. **Q1 Revenue by Branch (Completed Orders Only)**  
+   Filters to completed orders within a specific date range using `WHERE ... AND`, showing branch performance for a defined reporting period.
+
+3. **Month-over-Month Revenue Change & Cumulative Revenue**  
    Uses `LAG()` to compare each month to the prior month, calculates percent change, and tracks a running cumulative total with a window `SUM()`.
 
-3. **Product Revenue Ranked Within Category**  
+4. **Product Revenue Ranked Within Category**  
    `RANK()` partitioned by product category to see top performers within each group, rather than just overall.
 
-4. **Top 5 Customers by Revenue**  
+5. **Top 5 Customers by Revenue**  
    Uses `DENSE_RANK()` to identify the highest-spending customers.
 
-5. **Distinct Products and Total Units Ordered per Customer**  
+6. **Distinct Products and Total Units Ordered per Customer**  
    Uses `COUNT(DISTINCT ...)` alongside a summed quantity to analyze order variety versus order volume per customer.
 
 ## Notes
