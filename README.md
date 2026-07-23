@@ -29,14 +29,14 @@ sqlite3 database.db < queries.sql
 3. **Month-over-Month Revenue Change & Cumulative Revenue**  
    Uses `LAG()` to compare each month to the prior month, calculates percent change, and tracks a running cumulative total with a window `SUM()`.
 
-4. **Product Revenue Ranked Within Category**  
-   `RANK()` partitioned by product category to see top performers within each group, rather than just overall.
+4. **Distinct Products and Total Units Ordered per Customer**  
+   Uses `COUNT(DISTINCT ...)` alongside a summed quantity to analyze order variety versus order volume per customer.
 
 5. **Top 5 Customers by Revenue**  
-   Uses `DENSE_RANK()` to identify the highest-spending customers.
+   CTE chain that aggregates revenue per customer, then applies `DENSE_RANK()` to identify the top 5 highest-spending customers.
 
-6. **Distinct Products and Total Units Ordered per Customer**  
-   Uses `COUNT(DISTINCT ...)` alongside a summed quantity to analyze order variety versus order volume per customer.
+6. **Top 5 Products by Revenue Within Category**  
+   CTE chain that aggregates revenue per product, then applies `DENSE_RANK()` partitioned by category to surface top performers within each product group.
 
 ## Notes
 
