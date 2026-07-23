@@ -45,23 +45,23 @@ ORDER BY p.category, revenue_rank;
 
 
 -- Top 5 customers by total revenue (top-N ranking)
-SELECT  c.customer_name,
+SELECT  c.name,
         SUM(oi.quantity * oi.price_at_sale) AS customer_revenue,
         DENSE_RANK() OVER (ORDER BY SUM(oi.quantity * oi.price_at_sale) DESC) AS revenue_rank
 FROM customers c
 JOIN orders o ON c.customer_id = o.customer_id
 JOIN order_items oi ON o.order_id = oi.order_id
-GROUP BY c.customer_name
+GROUP BY c.name
 ORDER BY revenue_rank
 LIMIT 5;
 
 
 -- Distinct units ordered per customer
-SELECT  c.customer_name,
+SELECT  c.name,
         COUNT(DISTINCT oi.product_id) AS distinct_products_ordered,
         SUM(oi.quantity) AS total_units_ordered
 FROM customers c
 JOIN orders o ON c.customer_id = o.customer_id
 JOIN order_items oi ON o.order_id = oi.order_id
-GROUP BY c.customer_name
+GROUP BY c.name
 ORDER BY total_units_ordered DESC;
