@@ -30,6 +30,7 @@ CREATE TABLE orders (
     customer_id INTEGER,
     location_id INTEGER,
     order_date DATE,
+    status TEXT,
     FOREIGN KEY (customer_id) REFERENCES customers(customer_id),
     FOREIGN KEY (location_id) REFERENCES locations(location_id)
 );
