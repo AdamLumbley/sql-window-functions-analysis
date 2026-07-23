@@ -3,12 +3,24 @@
 -- Built in SQLite
 -- ============================================================
 
--- Total revenue by branch location
+-- Total revenue by branch location in DESC order
 SELECT  l.branch_name, 
         SUM(oi.quantity * oi.price_at_sale) AS total_revenue
 FROM locations l
 JOIN orders o ON l.location_id = o.location_id
 JOIN order_items oi ON o.order_id = oi.order_id
+GROUP BY l.branch_name
+ORDER BY total_revenue DESC;
+
+-- Q1 revenue by branch location, completed orders only
+SELECT  l.branch_name, 
+        SUM(oi.quantity * oi.price_at_sale) AS total_revenue
+FROM locations l
+JOIN orders o ON l.location_id = o.location_id
+JOIN order_items oi ON o.order_id = oi.order_id
+WHERE o.status = 'completed'
+  AND o.order_date >= '2025-01-01'
+  AND o.order_date < '2025-04-01'
 GROUP BY l.branch_name
 ORDER BY total_revenue DESC;
 
